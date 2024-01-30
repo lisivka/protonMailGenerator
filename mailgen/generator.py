@@ -47,64 +47,69 @@ def getMail():
             return False
     finally:
         user32.CloseClipboard()
-webbrowser.open('https://google.com')
-
+webbrowser.open('https://account.proton.me/signup?plan=free')
 time.sleep(5)
-pyautogui.keyDown('ctrlleft'); pyautogui.keyDown('shift'); pyautogui.typewrite('p'); pyautogui.keyUp('ctrlleft'); pyautogui.keyUp('shift')
-pyautogui.typewrite('https://account.proton.me/signup?plan=free\n')
-time.sleep(5)
+pyautogui.press('enter')
+# pyautogui.keyDown('ctrlleft'); pyautogui.keyDown('shift'); pyautogui.typewrite('p'); pyautogui.keyUp('ctrlleft'); pyautogui.keyUp('shift')
+# pyautogui.typewrite('https://account.proton.me/signup?plan=free\n')
+# time.sleep(5)
 
 
-
-def randomize(
-                _option_,
-                _length_
-            ):
-
-    if _length_ > 0 :
-
-        # Options:
-        #       -p      for letters, numbers and symbols
-        #       -s      for letters and numbers
-        #       -l      for letters only
-        #       -n      for numbers only
-        #       -m      for month selection
-        #       -d      for day selection
-        #       -y      for year selection
-
-        if _option_ == '-p':
-            string._characters_='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+'
-        elif _option_ == '-s':
-            string._characters_='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
-        elif _option_ == '-l':
-            string._characters_='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        elif _option_ == '-n':
-            string._characters_='1234567890'
-        elif _option_ == '-m':
-            string._characters_='JFMASOND'
-
-        if _option_ == '-d':
-            _generated_info_=random.randint(1,28)
-        elif _option_ == '-y':
-            _generated_info_=random.randint(1950,2000)
-        else:
-            _generated_info_=''
-            for _counter_ in range(0,_length_) :
-                _generated_info_= _generated_info_ + random.choice(string._characters_)
-
-        return _generated_info_
-
-    else:
-        return 'error'
+#
+# def randomize( _option_,  _length_       ):
+#
+#     if _length_ > 0 :
+#
+#         # Options:
+#         #       -p      for letters, numbers and symbols
+#         #       -s      for letters and numbers
+#         #       -l      for letters only
+#         #       -n      for numbers only
+#         #       -m      for month selection
+#         #       -d      for day selection
+#         #       -y      for year selection
+#
+#         if _option_ == '-p':
+#             string._characters_='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+'
+#         elif _option_ == '-s':
+#             string._characters_='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+#         elif _option_ == '-l':
+#             string._characters_='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+#         elif _option_ == '-n':
+#             string._characters_='1234567890'
+#         elif _option_ == '-m':
+#             string._characters_='JFMASOND'
+#
+#         if _option_ == '-d':
+#             _generated_info_=random.randint(1,28)
+#         elif _option_ == '-y':
+#             _generated_info_=random.randint(1950,2000)
+#         else:
+#             _generated_info_=''
+#             for _counter_ in range(0,_length_) :
+#                 _generated_info_= _generated_info_ + random.choice(string._characters_)
+#
+#         return _generated_info_
+#
+#     else:
+#         return 'error'
 
 # Username
-_username_=randomize('-s',5)+randomize('-s',5)+randomize('-s',5)
-pyautogui.typewrite(_username_ + '\t\t')
-print("Username:" + _username_)
+# _username_=randomize('-s',5)+randomize('-s',5)+randomize('-s',5)
+from mimesis import Generic
+from mimesis.locales import Locale
+generic = Generic(locale=Locale.EN)
+_username_ = generic.person.username()
 
+pyautogui.typewrite(_username_ )
+print("Username:" + _username_)
+pyautogui.press('tab', presses=1)
 # Password
-_password_=randomize('-p',16)
-pyautogui.typewrite(_password_+'\t'+_password_+'\t')
+# _password_=randomize('-p',16)
+_password_= generic.person.password(length=10)
+pyautogui.typewrite(_password_)
+pyautogui.press('tab', presses=1)
+
 print("Password:" + _password_)
 
 pyautogui.typewrite('\n')

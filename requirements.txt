@@ -1,0 +1,5 @@
+PyAutoGUI~=0.9.54
+pillow~=10.2.0
+mimesis~=13.1.0
+opencv-python~=4.9.0.80
+numpy~=1.26.3
