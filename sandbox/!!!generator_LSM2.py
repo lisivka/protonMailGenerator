@@ -44,9 +44,22 @@ options.add_argument("--window-size=800,600")
 driver = webdriver.Firefox(options=options)
 
 def open_dropmail(url):
-    driver.get(url)
+
+    host = "droopmailme"
+    while host not in ["dropmail.me","spymail.one",
+                       "10mail.org","minimail.gq",
+                       "yomail.info","emlhub.com",
+                       "zeroe.ml",
+                       ]:
+        print(f"{host=}")
+        driver.get(url)
+        fake_email = get_email()
+        _, host = fake_email.split("@")
+
+    print(f"GET {fake_email=}")
     print("First window: ", driver.title)
     sleep_random()
+    return fake_email
 
 
 
@@ -109,9 +122,9 @@ def click_button(xpath, name=""):
 
 def enter_data_signup():
 
-    driver.switch_to.window(driver.window_handles[1])
+    # driver.switch_to.window(driver.window_handles[1])
     print("Enter User: ", driver.title)
-    sleep_random()
+    sleep_random(3)
 
     pyautogui.typewrite(username, interval=0.1)
     pyautogui.press('tab', presses=3)
@@ -132,7 +145,7 @@ def enter_data_signup():
     button_xpath = '/html/body/div[1]/div[4]/div/main/div/div[2]/div/div[1]/nav/ul/li[2]'
     click_button(button_xpath, name="Tab EMAIL")
 
-def enter_email():
+def enter_email(fake_email):
     sleep_random()
     # pyautogui.typewrite(fake_email, interval=0.1)
     # pyautogui.press('tab', presses=1)
@@ -144,21 +157,24 @@ def enter_email():
 
 def get_code_confirm():
     driver.switch_to.window(driver.window_handles[0])
-    wait = WebDriverWait(driver, 10)
-    try:
-        wait.until(presence_of_element_located((
-            By.XPATH, "/html/body/div[2]/div[9]/div[2]/ul/li/div[3]/div[1]/pre")))
+    confirm_text = ""
+    while confirm_text == "":
+        wait = WebDriverWait(driver, 60)
+        try:
+            wait.until(presence_of_element_located((
+                By.XPATH, "/html/body/div[2]/div[9]/div[2]/ul/li/div[3]/div[1]/pre")))
 
-        results = driver.find_elements(
-            By.XPATH,
-            "/html/body/div[2]/div[9]/div[2]/ul/li/div[3]/div[1]/pre")
-        sleep_random()
-        my_text = results[0].text
-        print(my_text)
-    except Exception as e:
-        print(f"Ошибка при поиске CODE: {e}")
-        my_text = "ERROR_CODE"
-    return my_text.strip()
+            results = driver.find_elements(
+                By.XPATH,
+                "/html/body/div[2]/div[9]/div[2]/ul/li/div[3]/div[1]/pre")
+            sleep_random()
+            confirm_text = results[0].text
+            print(f"{confirm_text=}")
+
+        except Exception as e:
+            print(f"Ошибка при поиске CODE: {e}")
+            confirm_text = ""
+    return confirm_text.strip()
 
 def enter_confirm_():
     driver.switch_to.window(driver.window_handles[1])
@@ -169,32 +185,40 @@ def enter_confirm_():
     click_button(button_xpath, name="Enter CONFIRM")
     sleep_random()
 
+def enter_recover():
+    driver.switch_to.window(driver.window_handles[1])
+    sleep_random()
+    button_xpath ='/html/body/div[1]/div[4]/div/main/div/div[2]/form/button[2]'
+    click_button(button_xpath, name="Enter RECOVER")
+    sleep_random()
+    pyautogui.press('enter')
+    sleep_random()
+    pyautogui.press('enter')
+    sleep_random()
+    pyautogui.press('enter')
 
-
-def save_user():
+def save_user(fake_email):
     logfile = open("../mailgen/accLog.txt", "a")
     logfile.write(username + "@proton.me\t" + password +"\t" + fake_email + "\n")
     logfile.close()
 
 
 url_drop = "https://dropmail.me/en/"
-open_dropmail(url_drop)
-fake_email = "dropmail_me"
-while fake_email[-11:] != "dropmail.me":
-    print(f"{fake_email[-11:]=}")
-    driver.get(url_drop)
-    fake_email = get_email()
+fake_email = open_dropmail(url_drop)
+open_proton()
+enter_data_signup()
+enter_email(fake_email)
+confirm = get_code_confirm()
+print(f"{confirm=}")
+confirm= confirm[-6:]
 
-print(f"{fake_email=}")
+enter_confirm_()
+#
+save_user(fake_email)
 
-# open_proton()
-# enter_data_signup()
-# enter_email()
+# url_ = r"file:\\\D:\WORK\Freelance\protonMailGenerator\Temporary_email.html"
+# driver.get(url_)
 # confirm = get_code_confirm()
 # print(f"{confirm=}")
 # confirm= confirm[-6:]
-#
-# enter_confirm_()
-#
-# save_user()
 
