@@ -11,6 +11,7 @@ import ctypes
 import re
 from mimesis import Generic
 from mimesis.locales import Locale
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -23,6 +24,7 @@ import pyperclip
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.expected_conditions import \
     presence_of_element_located
+from selenium.webdriver.common.keys import Keys
 
 generic = Generic(locale=Locale.EN)
 username = generic.person.username() + str(random.randint(1, 100))
@@ -38,18 +40,22 @@ def sleep_random(seconds=0):
 
 options = Options()
 options.add_argument("-private")
-options.add_argument("--window-size=800,600")
-#scale
+# options.add_argument("--window-size=640,480")
+# scale
 # options.add_argument("--scale=0.5")
 driver = webdriver.Firefox(options=options)
+driver.set_window_size(800, 800)
+
+driver.execute_script("document.body.style.zoom='50%'")
+
 
 def open_dropmail(url):
-
     host = "droopmailme"
-    while host not in ["dropmail.me","spymail.one",
-                       "10mail.org","minimail.gq",
-                       "yomail.info","emlhub.com",
-                       "zeroe.ml",
+    while host not in ["dropmail.me", "spymail.one",
+                       "10mail.org", "minimail.gq",
+                       "yomail.info", "emlhub.com",
+                       "zeroe.ml", "emltmp.com",
+                       "laste.ml",
                        ]:
         print(f"{host=}")
         driver.get(url)
@@ -60,8 +66,6 @@ def open_dropmail(url):
     print("First window: ", driver.title)
     sleep_random()
     return fake_email
-
-
 
 
 def get_email():
@@ -82,15 +86,13 @@ def get_email():
     return my_email
 
 
-def open_proton():
+def open_proton(url):
     driver.execute_script("window.open('', '_blank');")
     # Переключаемся на вторую вкладку
     driver.switch_to.window(driver.window_handles[1])
-    driver.get("https://account.proton.me/signup?plan=free")
+    driver.get(url)
     print("Second window: ", driver.title)
     sleep_random()
-
-
 
 
 def find_xpath(target, data='', driver=driver, name=""):
@@ -121,7 +123,6 @@ def click_button(xpath, name=""):
 
 
 def enter_data_signup():
-
     # driver.switch_to.window(driver.window_handles[1])
     print("Enter User: ", driver.title)
     sleep_random(3)
@@ -137,7 +138,7 @@ def enter_data_signup():
     print("Password:" + password)
     sleep_random()
 
-    button_xpath ='/html/body/div[1]/div[4]/div[1]/main/div[1]/div[2]/form/button'
+    button_xpath = '/html/body/div[1]/div[4]/div[1]/main/div[1]/div[2]/form/button'
     click_button(button_xpath, name="Create User")
 
     sleep_random()
@@ -145,15 +146,17 @@ def enter_data_signup():
     button_xpath = '/html/body/div[1]/div[4]/div/main/div/div[2]/div/div[1]/nav/ul/li[2]'
     click_button(button_xpath, name="Tab EMAIL")
 
+
 def enter_email(fake_email):
     sleep_random()
     # pyautogui.typewrite(fake_email, interval=0.1)
     # pyautogui.press('tab', presses=1)
     pyautogui.typewrite(fake_email, interval=0.1)
-    button_xpath ='/html/body/div[1]/div[4]/div/main/div/div[2]/div/div[2]/button'
+    button_xpath = '/html/body/div[1]/div[4]/div/main/div/div[2]/div/div[2]/button'
     click_button(button_xpath, name="Enter EMAIL")
-    '/html/body/div[1]/div[4]/div/main/div/div[2]/div[2]/div[2]/span' #
+    '/html/body/div[1]/div[4]/div/main/div/div[2]/div[2]/div[2]/span'  #
     sleep_random()
+
 
 def get_code_confirm():
     driver.switch_to.window(driver.window_handles[0])
@@ -162,7 +165,8 @@ def get_code_confirm():
         wait = WebDriverWait(driver, 60)
         try:
             wait.until(presence_of_element_located((
-                By.XPATH, "/html/body/div[2]/div[9]/div[2]/ul/li/div[3]/div[1]/pre")))
+                By.XPATH,
+                "/html/body/div[2]/div[9]/div[2]/ul/li/div[3]/div[1]/pre")))
 
             results = driver.find_elements(
                 By.XPATH,
@@ -176,51 +180,62 @@ def get_code_confirm():
             confirm_text = ""
     return confirm_text.strip()
 
-def enter_confirm_():
+
+def enter_confirm_(confirm):
     driver.switch_to.window(driver.window_handles[1])
     sleep_random()
     pyautogui.typewrite(confirm, interval=0.1)
     pyautogui.press('tab', presses=1)
-    button_xpath ='/html/body/div[1]/div[4]/div/main/div/div[2]/button[1]'
+    button_xpath = '/html/body/div[1]/div[4]/div/main/div/div[2]/button[1]'
     click_button(button_xpath, name="Enter CONFIRM")
     sleep_random()
+
 
 def enter_recover():
     driver.switch_to.window(driver.window_handles[1])
     sleep_random()
-    button_xpath ='/html/body/div[1]/div[4]/div/main/div/div[2]/form/button[2]'
+    button_xpath = '/html/body/div[1]/div[4]/div/main/div/div[2]/form/button[2]'
     click_button(button_xpath, name="Enter RECOVER")
     sleep_random(15)
     pyautogui.press('enter')
     sleep_random(5)
     pyautogui.press('tab', presses=3)
-    pyautogui.press( 'enter')
+    pyautogui.press('enter')
     pyautogui.press('tab', presses=1)
     sleep_random(5)
     pyautogui.press('enter')
 
+
 def save_user(fake_email):
     logfile = open("../mailgen/accLog.txt", "a")
-    logfile.write(username + "@proton.me\t" + password +"\t" + fake_email + "\n")
+    logfile.write(
+        username + "@proton.me\t" + password + "\t" + fake_email + "\n")
     logfile.close()
 
 
-url_drop = "https://dropmail.me/en/"
-fake_email = open_dropmail(url_drop)
-open_proton()
-enter_data_signup()
-enter_email(fake_email)
-confirm = get_code_confirm()
-print(f"{confirm=}")
-confirm= confirm[-6:]
-
-enter_confirm_()
+# url_drop = "https://dropmail.me/en/"
+# fake_email = open_dropmail(url_drop)
+# url_proton = "https://account.proton.me/signup?plan=free"
+# open_proton(url_proton)
+# enter_data_signup()
+# enter_email(fake_email)
+# confirm = get_code_confirm()
+# print(f"{confirm=}")
+# confirm = confirm[-6:]
 #
-save_user(fake_email)
+# enter_confirm_(confirm)
+# #
+# save_user(fake_email)
 
 # url_ = r"file:\\\D:\WORK\Freelance\protonMailGenerator\Temporary_email.html"
 # driver.get(url_)
 # confirm = get_code_confirm()
 # print(f"{confirm=}")
 # confirm= confirm[-6:]
+url_proton = "https://account.proton.me/signup?plan=free"
+driver.get(url_proton)
+sleep_random()
+
+
+# actions.perform()
 
