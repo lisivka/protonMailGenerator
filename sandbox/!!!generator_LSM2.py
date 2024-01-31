@@ -190,11 +190,13 @@ def enter_recover():
     sleep_random()
     button_xpath ='/html/body/div[1]/div[4]/div/main/div/div[2]/form/button[2]'
     click_button(button_xpath, name="Enter RECOVER")
-    sleep_random()
+    sleep_random(15)
     pyautogui.press('enter')
-    sleep_random()
-    pyautogui.press('enter')
-    sleep_random()
+    sleep_random(5)
+    pyautogui.press('tab', presses=3)
+    pyautogui.press( 'enter')
+    pyautogui.press('tab', presses=1)
+    sleep_random(5)
     pyautogui.press('enter')
 
 def save_user(fake_email):
