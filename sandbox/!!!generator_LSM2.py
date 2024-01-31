@@ -1,0 +1,200 @@
+#! python3
+# Michi4
+from PIL import Image
+import pyautogui
+import sys
+import time
+import random
+import string
+import webbrowser
+import ctypes
+import re
+from mimesis import Generic
+from mimesis.locales import Locale
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import pyautogui
+from selenium import webdriver
+import webbrowser
+import time
+import random
+import pyperclip
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.support.expected_conditions import \
+    presence_of_element_located
+
+generic = Generic(locale=Locale.EN)
+username = generic.person.username() + str(random.randint(1, 100))
+password = generic.person.password(length=10)
+
+
+def sleep_random(seconds=0):
+    wait = (random.randint(1 + seconds, 3 + seconds) + random.random())
+    print(f'Wait: {wait}')
+    time.sleep(wait)
+    return
+
+
+options = Options()
+options.add_argument("-private")
+options.add_argument("--window-size=800,600")
+#scale
+# options.add_argument("--scale=0.5")
+driver = webdriver.Firefox(options=options)
+
+def open_dropmail(url):
+    driver.get(url)
+    print("First window: ", driver.title)
+    sleep_random()
+
+
+
+
+def get_email():
+    wait = WebDriverWait(driver, 10)
+    try:
+        wait.until(presence_of_element_located((
+            By.XPATH, "/html/body/div[2]/div[3]/div/div/div/span[1]")))
+
+        results = driver.find_elements(
+            By.XPATH,
+            "/html/body/div[2]/div[3]/div/div/div/span[1]")
+        sleep_random()
+        my_email = results[0].text
+        print(my_email)
+    except Exception as e:
+        print(f"Ошибка при поиске EMAIL: {e}")
+        my_email = "ERROR"
+    return my_email
+
+
+def open_proton():
+    driver.execute_script("window.open('', '_blank');")
+    # Переключаемся на вторую вкладку
+    driver.switch_to.window(driver.window_handles[1])
+    driver.get("https://account.proton.me/signup?plan=free")
+    print("Second window: ", driver.title)
+    sleep_random()
+
+
+
+
+def find_xpath(target, data='', driver=driver, name=""):
+    try:
+        wait = WebDriverWait(driver, 2)
+        element = wait.until(presence_of_element_located((
+            By.XPATH, target)))
+        element.send_keys(data) if element else print(f"{name} not found")
+    except Exception as e:
+        print(f"Ошибка при поиске элемента {name}: {e}")
+        return False
+
+
+def click_button(xpath, name=""):
+    try:
+        button_xpath = xpath
+        button_element = WebDriverWait(driver, 2).until(
+            EC.element_to_be_clickable((By.XPATH, button_xpath))
+        )
+        if button_element:
+            button_element.click()
+            print(f"Кнопка {name} нажата")
+        else:
+            print(f"Кнопка {name} не найдена")
+        return button_element
+    except Exception as e:
+        print(f"Ошибка при поиске кнопки {name}: {e}")
+
+
+def enter_data_signup():
+
+    driver.switch_to.window(driver.window_handles[1])
+    print("Enter User: ", driver.title)
+    sleep_random()
+
+    pyautogui.typewrite(username, interval=0.1)
+    pyautogui.press('tab', presses=3)
+    print("Username:" + username)
+
+    pyautogui.typewrite(password, interval=0.1)
+    pyautogui.press('tab', presses=1)
+    pyautogui.typewrite(password, interval=0.1)
+    pyautogui.press('enter')
+    print("Password:" + password)
+    sleep_random()
+
+    button_xpath ='/html/body/div[1]/div[4]/div[1]/main/div[1]/div[2]/form/button'
+    click_button(button_xpath, name="Create User")
+
+    sleep_random()
+
+    button_xpath = '/html/body/div[1]/div[4]/div/main/div/div[2]/div/div[1]/nav/ul/li[2]'
+    click_button(button_xpath, name="Tab EMAIL")
+
+def enter_email():
+    sleep_random()
+    # pyautogui.typewrite(fake_email, interval=0.1)
+    # pyautogui.press('tab', presses=1)
+    pyautogui.typewrite(fake_email, interval=0.1)
+    button_xpath ='/html/body/div[1]/div[4]/div/main/div/div[2]/div/div[2]/button'
+    click_button(button_xpath, name="Enter EMAIL")
+    '/html/body/div[1]/div[4]/div/main/div/div[2]/div[2]/div[2]/span' #
+    sleep_random()
+
+def get_code_confirm():
+    driver.switch_to.window(driver.window_handles[0])
+    wait = WebDriverWait(driver, 10)
+    try:
+        wait.until(presence_of_element_located((
+            By.XPATH, "/html/body/div[2]/div[9]/div[2]/ul/li/div[3]/div[1]/pre")))
+
+        results = driver.find_elements(
+            By.XPATH,
+            "/html/body/div[2]/div[9]/div[2]/ul/li/div[3]/div[1]/pre")
+        sleep_random()
+        my_text = results[0].text
+        print(my_text)
+    except Exception as e:
+        print(f"Ошибка при поиске CODE: {e}")
+        my_text = "ERROR_CODE"
+    return my_text.strip()
+
+def enter_confirm_():
+    driver.switch_to.window(driver.window_handles[1])
+    sleep_random()
+    pyautogui.typewrite(confirm, interval=0.1)
+    pyautogui.press('tab', presses=1)
+    button_xpath ='/html/body/div[1]/div[4]/div/main/div/div[2]/button[1]'
+    click_button(button_xpath, name="Enter CONFIRM")
+    sleep_random()
+
+
+
+def save_user():
+    logfile = open("../mailgen/accLog.txt", "a")
+    logfile.write(username + "@proton.me\t" + password +"\t" + fake_email + "\n")
+    logfile.close()
+
+
+url_drop = "https://dropmail.me/en/"
+open_dropmail(url_drop)
+fake_email = "dropmail_me"
+while fake_email[-11:] != "dropmail.me":
+    print(f"{fake_email[-11:]=}")
+    driver.get(url_drop)
+    fake_email = get_email()
+
+print(f"{fake_email=}")
+
+# open_proton()
+# enter_data_signup()
+# enter_email()
+# confirm = get_code_confirm()
+# print(f"{confirm=}")
+# confirm= confirm[-6:]
+#
+# enter_confirm_()
+#
+# save_user()
+
